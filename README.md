@@ -8,7 +8,7 @@ A make file has been provided for running, testing, and generating solution file
 
 ### Generating solution files
 
-Generating todays solution files
+Generating today's solution files
 ```sh
 make gen
 ```
@@ -20,12 +20,12 @@ make gen year=<year> day=<day>
 
 ### Testing a solution
 
-Testing todays solution (both parts)
+Testing today's solution (both parts)
 ```sh
 make test
 ```
 
-Testing todays solution (specific part)
+Testing today's solution (specific part)
 ```sh
 make test part=<part>
 ```
@@ -42,7 +42,7 @@ make test year=<year> day=<day> part=<part>
 
 ### Running a solution
 
-Running todays solution
+Running today's solution
 ```sh
 make run part=<part>
 ```

@@ -13,11 +13,11 @@ gen:	##@ Generate the solution files if they don't exist, including downloading 
 	@go run main.go -generate -year $(year) -day $(day) -part $(part)
 
 .PHONY: test
-test:	##@ Test the soltion(s): make test [year=value] [day=value] [part=value]
+test:	##@ Test the solution(s): make test [year=value] [day=value] [part=value]
 	@go run main.go -test -year $(year) -day $(day) -part $(part)
 
 .PHONY: run
-run:	##@ Run the solution: make run [year=value] [day=value] part=value
+run:	##@ Run the solution: make run [year=value] [day=value] [part=value]
 	@go run main.go -run -year $(year) -day $(day) -part $(part)
 
 ##@

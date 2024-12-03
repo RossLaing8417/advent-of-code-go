@@ -18,7 +18,6 @@ import (
 func main() {
 	if err := execute(); err != nil {
 		fmt.Println(err)
-		os.Exit(1)
 	}
 }
 
@@ -57,11 +56,7 @@ func execute() error {
 		return errors.New("Day cannot be after 25")
 	}
 
-	if *part == 0 {
-		if *run {
-			return errors.New("'-part' is mandatory when '-run' is specified")
-		}
-	} else if *part > 2 {
+	if *part > 2 {
 		return errors.New(fmt.Sprintf("'-part %d' is invalid, valid value are 1 or 2", *part))
 	}
 
@@ -103,15 +98,15 @@ func execute() error {
 		output, err := cmd.Output()
 		if err != nil {
 			if exit_err, ok := err.(*exec.ExitError); ok && len(exit_err.Stderr) > 0 {
-				fmt.Println(string(exit_err.Stderr))
+				fmt.Println(strings.Trim(string(exit_err.Stderr), "\n"))
 			}
 			if len(output) > 0 {
-				fmt.Println(string(output))
+				fmt.Println(strings.Trim(string(output), "\n"))
 			}
 			return err
 		}
 		if len(output) > 0 {
-			fmt.Println(string(output))
+			fmt.Println(strings.Trim(string(output), "\n"))
 		}
 	}
 
@@ -129,50 +124,11 @@ func generateSolutionFiles(year uint, day uint) error {
 		return err
 	}
 
-	data := struct {
-		Year string
-		Day  string
-	}{
-		Year: fmt.Sprintf("%4d", year),
-		Day:  fmt.Sprintf("%02d", day),
+	if err := generateFile(tmpl, dir, "main.go", year, day); err != nil {
+		return err
 	}
-
-	main_file := dir + "/main.go"
-	if _, err := os.Stat(main_file); err != nil {
-		if !errors.Is(err, os.ErrNotExist) {
-			return err
-		}
-
-		file, err := os.Create(main_file)
-		if err != nil {
-			return nil
-		}
-
-		if err := tmpl.ExecuteTemplate(file, "main.go", data); err != nil {
-			return err
-
-		}
-	} else {
-		return errors.New(fmt.Sprintf("File '%s' already exists", main_file))
-	}
-
-	main_test_file := dir + "/main_test.go"
-	if _, err := os.Stat(main_test_file); err != nil {
-		if !errors.Is(err, os.ErrNotExist) {
-			return err
-		}
-
-		file, err := os.Create(main_test_file)
-		if err != nil {
-			return nil
-		}
-
-		if err := tmpl.ExecuteTemplate(file, "main_test.go", data); err != nil {
-			return err
-
-		}
-	} else {
-		return errors.New(fmt.Sprintf("File '%s' already exists and will not be overwritten...", main_test_file))
+	if err := generateFile(tmpl, dir, "main_test.go", year, day); err != nil {
+		return err
 	}
 
 	session_data, err := os.ReadFile(".aoc_session")
@@ -180,8 +136,8 @@ func generateSolutionFiles(year uint, day uint) error {
 		if !errors.Is(err, os.ErrNotExist) {
 			return err
 		}
-	}
-	if len(session_data) > 0 {
+		fmt.Println(".aoc_session not found, skipping input download...")
+	} else {
 		context, cancel := context.WithTimeout(context.Background(), time.Second*10)
 		defer cancel()
 		request, err := http.NewRequestWithContext(context, "GET", fmt.Sprintf("https://adventofcode.com/%4d/day/%d/input", year, day), nil)
@@ -201,9 +157,36 @@ func generateSolutionFiles(year uint, day uint) error {
 			return err
 		}
 		os.WriteFile(dir+"/input.txt", body, 0644)
-	} else {
-		return errors.New(".aoc_session not found, skipping input download...")
 	}
 
+	return nil
+}
+
+func generateFile(tmpl *template.Template, dir string, name string, year uint, day uint) error {
+	filepath := dir + "/" + name
+	if _, err := os.Stat(filepath); err != nil {
+		if !errors.Is(err, os.ErrNotExist) {
+			return err
+		}
+
+		file, err := os.Create(filepath)
+		if err != nil {
+			return nil
+		}
+
+		if err := tmpl.ExecuteTemplate(file, name, struct {
+			Year string
+			Day  string
+		}{
+			Year: fmt.Sprintf("%4d", year),
+			Day:  fmt.Sprintf("%02d", day),
+		}); err != nil {
+			return err
+
+		}
+		fmt.Printf("File '%s' generated...\n", filepath)
+	} else {
+		fmt.Printf("File '%s' already exists and will not be overwritten...\n", filepath)
+	}
 	return nil
 }
