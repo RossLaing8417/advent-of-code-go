@@ -14,11 +14,11 @@ gen:	##@ Generate the solution files if they don't exist, including downloading 
 
 .PHONY: test
 test:	##@ Test the solution(s): make test [year=value] [day=value] [part=value]
-	@go run main.go -test -year $(year) -day $(day) -part $(part)
+	@go run main.go -test -year $(year) -day $(day) -part $(part) -cpuprofile="$(cpuprofile)" -memprofile="$(memprofile)"
 
 .PHONY: run
 run:	##@ Run the solution: make run [year=value] [day=value] [part=value]
-	@go run main.go -run -year $(year) -day $(day) -part $(part)
+	@go run main.go -run -year $(year) -day $(day) -part $(part) -cpuprofile="$(cpuprofile)" -memprofile="$(memprofile)"
 
 ##@
 ##@ Misc commands

@@ -5,6 +5,8 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"runtime"
+	"runtime/pprof"
 	"strings"
 )
 
@@ -17,7 +19,21 @@ func Execute(filepath string, part1_fn func(data string) (int, error), part2_fn 
 
 func execute(filepath string, part1_fn func(data string) (int, error), part2_fn func(data string) (int, error)) error {
 	part := flag.Uint("part", 0, "solution part")
+	cpuprofile := flag.String("cpuprofile", "", "cpu profile file")
+	memprofile := flag.String("memprofile", "", "mem profile file")
 	flag.Parse()
+
+	if len(*cpuprofile) > 0 {
+		f, err := os.Create("cpu.prof")
+		if err != nil {
+			panic(err)
+		}
+		defer f.Close()
+		if err := pprof.StartCPUProfile(f); err != nil {
+			panic(err)
+		}
+		defer pprof.StopCPUProfile()
+	}
 
 	if *part > 2 {
 		return errors.New(fmt.Sprintf("'-part %d' is invalid, valid value are 1 or 2\n", *part))
@@ -52,6 +68,17 @@ func execute(filepath string, part1_fn func(data string) (int, error), part2_fn 
 		fmt.Print(result)
 	}
 
+	if *memprofile != "" {
+		f, err := os.Create(*memprofile)
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+		runtime.GC()
+		if err := pprof.WriteHeapProfile(f); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 

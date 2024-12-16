@@ -28,6 +28,8 @@ func execute() error {
 	year := flag.Uint("year", 0, "solution year")
 	day := flag.Uint("day", 0, "solution day")
 	part := flag.Uint("part", 0, "solution part")
+	cpuprofile := flag.String("cpuprofile", "", "cpu profile file")
+	memprofile := flag.String("memprofile", "", "mem profile file")
 	flag.Parse()
 
 	if (*generate && *test) || (*generate && *run) || (*test && *run) {
@@ -72,6 +74,10 @@ func execute() error {
 				cmd = exec.Command(
 					"go",
 					"test",
+					"-cpuprofile",
+					*cpuprofile,
+					"-memprofile",
+					*memprofile,
 					dir+"/main.go",
 					dir+"/main_test.go",
 				)
@@ -79,6 +85,10 @@ func execute() error {
 				cmd = exec.Command(
 					"go",
 					"test",
+					"-cpuprofile",
+					*cpuprofile,
+					"-memprofile",
+					*memprofile,
 					dir+"/main.go",
 					dir+"/main_test.go",
 					"-run",
@@ -93,6 +103,10 @@ func execute() error {
 				dir+"/main.go",
 				"-part",
 				strconv.Itoa(int(*part)),
+				"-cpuprofile",
+				*cpuprofile,
+				"-memprofile",
+				*memprofile,
 			)
 		}
 		output, err := cmd.Output()
