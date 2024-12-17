@@ -170,7 +170,11 @@ func generateSolutionFiles(year uint, day uint) error {
 		if err != nil {
 			return err
 		}
-		os.WriteFile(dir+"/input.txt", body, 0644)
+		err = os.WriteFile(dir+"/input.txt", body, 0644)
+		if err != nil {
+			return err
+		}
+		fmt.Printf("File '%s/input.txt' downloaded...\n", dir)
 	}
 
 	return nil

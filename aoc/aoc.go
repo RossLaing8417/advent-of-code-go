@@ -10,14 +10,14 @@ import (
 	"strings"
 )
 
-func Execute(filepath string, part1_fn func(data string) (int, error), part2_fn func(data string) (int, error)) {
+func Execute[T1 any, T2 any](filepath string, part1_fn func(data string) (T1, error), part2_fn func(data string) (T2, error)) {
 	if err := execute(filepath, part1_fn, part2_fn); err != nil {
 		os.Stderr.Write([]byte(err.Error()))
 		os.Exit(1)
 	}
 }
 
-func execute(filepath string, part1_fn func(data string) (int, error), part2_fn func(data string) (int, error)) error {
+func execute[T1 any, T2 any](filepath string, part1_fn func(data string) (T1, error), part2_fn func(data string) (T2, error)) error {
 	part := flag.Uint("part", 0, "solution part")
 	cpuprofile := flag.String("cpuprofile", "", "cpu profile file")
 	memprofile := flag.String("memprofile", "", "mem profile file")

@@ -2,13 +2,13 @@ package main
 
 import "testing"
 
-type test_data struct {
+type test_data[T comparable] struct {
 	name     string
 	input    string
-	expected int
+	expected T
 }
 
-func testPart(t *testing.T, tests []test_data, fn func(data string) (int, error)) {
+func testPart[T comparable](t *testing.T, tests []test_data[T], fn func(data string) (T, error)) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			result, err := fn(test.input)
@@ -16,14 +16,14 @@ func testPart(t *testing.T, tests []test_data, fn func(data string) (int, error)
 				t.Error(err)
 			}
 			if result != test.expected {
-				t.Errorf("Expected %d, got: %d", test.expected, result)
+				t.Errorf("Expected %v, got: %v", test.expected, result)
 			}
 		})
 	}
 }
 
 func TestPart1(t *testing.T) {
-	testPart(t, []test_data{
+	testPart(t, []test_data[int]{
 		{
 			name:     "Example",
 			input:    ``,
@@ -33,7 +33,7 @@ func TestPart1(t *testing.T) {
 }
 
 func TestPart2(t *testing.T) {
-	testPart(t, []test_data{
+	testPart(t, []test_data[int]{
 		{
 			name:     "Example",
 			input:    ``,
